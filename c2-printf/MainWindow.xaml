@@ -1,0 +1,29 @@
+﻿<Controls:MetroWindow x:Class="c2_printf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:local="clr-namespace:c2_printf"
+        mc:Ignorable="d"
+        Title="C2-PRINTF" Height="378.299" Width="525">
+    <StackPanel Margin="10, 10, 10, 10">
+        <Label FontSize="20" Content="C2-PRINTF CONFIGURATION"/>
+        <StackPanel Orientation="Horizontal">
+            <Label Width="100" Content="READ ADDRESS"/>
+            <TextBox IsEnabled="{Binding IsNotConnected}" Width="100" Text="{Binding ReadAddress}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Label Width="100" Content="LENGTH"/>
+            <TextBox IsEnabled="{Binding IsNotConnected}" Width="100" Text="{Binding ReadLength}"/>
+        </StackPanel>
+        <Label Margin="0, 10, 0, 0" FontSize="20" Content="DEBUGGER"/>
+        <DockPanel >
+            <Button Content="{Binding ConnectButtonText}" DockPanel.Dock="Right" Click="ConnectDisconnectButton_Click"/>
+            <ComboBox IsEnabled="{Binding IsNotConnected}" ItemsSource="{Binding Scanner.Debuggers}" SelectedItem="{Binding SelectedDebugger, Mode=TwoWay}"/>
+        </DockPanel>
+        <TextBlock Text="{Binding ConnectedText}" />
+        <Label Margin="0, 10, 0, 0" FontSize="20" Content="CONSOLE"/>
+        <TextBox Height="100" x:Name="ConsoleTextBox" />
+    </StackPanel>
+</Controls:MetroWindow>
