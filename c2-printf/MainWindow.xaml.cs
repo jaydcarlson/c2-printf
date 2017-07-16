@@ -31,7 +31,7 @@ namespace c2_printf
         CancellationTokenSource cts;
         CancellationToken token;
         Task consoleTask;
-
+        bool connectionPending = false;
         /// <summary>
         /// Main entrypoint
         /// </summary>
@@ -110,7 +110,7 @@ namespace c2_printf
         {
             // strangely, if we scan for devices while the debugger is attached to the target, it disconnects.
             // So only scan when we're not connected.
-            if (IsConnected) return;
+            if (connectionPending) return;
 
             Scanner.Scan();
         }
@@ -130,6 +130,7 @@ namespace c2_printf
 
             if(!IsConnected)
             {
+                connectionPending = true;
                 IsConnected = SelectedDebugger.Connect();
                 if (IsConnected)
                     StartConsole();
@@ -153,20 +154,22 @@ namespace c2_printf
                 {
                     if (token.IsCancellationRequested)
                     {
-                        SelectedDebugger?.Disconnect();
+                        SelectedDebugger.Disconnect();
                         IsConnected = false;
+                        connectionPending = false; // resume scanning
                         return;
                     }
 
                     // we have to halt the target to read RAM
-                    SelectedDebugger?.HaltTarget();
-                    var data = SelectedDebugger?.GetXRAMMemory(readAddress, ReadLength);
-                    if (data[ReadLength-1] == 0x01)
+                    SelectedDebugger.HaltTarget();
+                    var flag = SelectedDebugger.GetXRAMMemory(readAddress + ReadLength - 1, 1)[0];
+                    if (flag > 0)
                     {
-                        // we have a new message!
-                        var text = Encoding.ASCII.GetString(data.Take(ReadLength - 1).ToArray()).TrimEnd((Char)0);
+                        // we have a new message! Read the whole thing out
+                        var data = SelectedDebugger.GetXRAMMemory(readAddress, flag);
+                        var text = Encoding.ASCII.GetString(data);
                         Application.Current.Dispatcher.Invoke(new Action(() => { ConsoleTextBox.AppendText(text); ConsoleTextBox.ScrollToEnd(); }));
-                        SelectedDebugger?.SetXRAMMemory(readAddress + ReadLength - 1, new byte[1] { 0x00 });
+                        SelectedDebugger.SetXRAMMemory(readAddress + ReadLength - 1, new byte[1] { 0x00 });
                     }
                     // resume target
                     SelectedDebugger?.RunTarget();

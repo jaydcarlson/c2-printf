@@ -35,7 +35,7 @@ uint8_t xdata printData[255]   _at_ 0x000;   /* array at xdata 0x000 */
 // ----------------------------------------------------------------------------
 int main (void)
 {
-	int i;
+	int i, size;
 	enter_DefaultMode_from_RESET();
 
 	for(i = 0;i<sizeof(printData); i++)
@@ -47,9 +47,9 @@ int main (void)
 	   i = 0;
 	   while(1) {
 		   i++;
-		  sprintf(printData, "Hello, world #%u!\n", i); // print "Hello, world #0 (etc)
-		  printData[254] = 1; // tell the computer software we're ready to read
-		  while(printData[254] == 1); // wait for the computer software to reset our flag
+		   size = sprintf(printData, "Hello, world #%u!\n", i); // print "Hello, world #0 (etc)
+		  printData[254] = size; // tell the computer how many bytes to transfer
+		  while(printData[254] != 0); // wait for the computer software to reset our flag
 	   }
 	}
 }
