@@ -143,11 +143,12 @@ namespace c2_printf
 
         public void StartConsole()
         {
+            //SelectedDebugger.SetC2ClockStrobe(0x25); // doesn't seem to do anything
             SelectedDebugger.RunTarget();
             cts = new CancellationTokenSource();
             token = cts.Token;
 
-            consoleTask = Task.Factory.StartNew(() =>
+            consoleTask = Task.Factory.StartNew(async () =>
             {
             int readAddress = int.Parse(ReadAddress.Replace("0x", ""), System.Globalization.NumberStyles.AllowHexSpecifier);
                 while (SelectedDebugger != null)
@@ -172,7 +173,8 @@ namespace c2_printf
                         SelectedDebugger.SetXRAMMemory(readAddress + ReadLength - 1, new byte[1] { 0x00 });
                     }
                     // resume target
-                    SelectedDebugger?.RunTarget();
+                    SelectedDebugger.RunTarget();
+                    await Task.Delay(20);
                 }
             }, token);
         }

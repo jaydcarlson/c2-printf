@@ -35,7 +35,8 @@ namespace c2_printf
             var res = NativeMethods.ConnectUSB(serialString, 1);
             if (res != 0)
                 Debug.WriteLine("Error with HaltTarget(): " + res);
-            return NativeMethods.Connected();
+            return NativeMethods.IsUSBConnected() == 1;
+            //return true;
         }
 
         /// <summary>
@@ -78,6 +79,16 @@ namespace c2_printf
             if (res != 0)
                 Debug.WriteLine("Error with HaltTarget(): " + res);
             return retVal;
+        }
+
+        public void SetC2ClockStrobe(int value)
+        {
+            if ((byte)(value) >= 0x26u)
+                throw new Exception("Value is out of range");
+
+            var res = NativeMethods.SetC2ClockStrobe((byte)value);
+            if (res != 0)
+                Debug.WriteLine("Error with HaltTarget(): " + res);
         }
 
         /// <summary>
