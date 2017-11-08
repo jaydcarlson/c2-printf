@@ -22,7 +22,17 @@ namespace c2_printf
         public C2Scanner()
         {
             Debuggers.CollectionChanged += Debuggers_CollectionChanged;
-            Scan();
+            try
+            {
+                Scan();
+            }
+            catch (Exception e)
+            {
+                // display a message about the missing DLLs
+                String message = e.Message;
+                message += "\n\nMake sure the following DLLs exist in the program folder:\n\n\tlibgcc_s_dw2-1.dll\n\tlibstdc++-6.dll\n\tslab8051.dll\n\tslabhiddevice.dll\n";
+                MessageBoxResult result = MessageBox.Show(message, "Dll(s) Missing?", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
